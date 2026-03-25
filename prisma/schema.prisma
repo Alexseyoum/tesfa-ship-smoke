@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectStatus {
+  intake
+  survey
+  proposal_approved
+  installation
+  commissioning
+  handover_complete
+}
+
+enum UserRole {
+  OPS
+  CLIENT
+}
+
+model Project {
+  id         String      @id @default(cuid())
+  name       String
+  clientName String
+  location   String
+  status     ProjectStatus @default(intake)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  complianceEvidences ComplianceEvidence[]
+}
+
+model ComplianceEvidence {
+  id        String   @id @default(cuid())
+  projectId String
+  itemId    String
+  note      String?
+  fileUrl   String?
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
